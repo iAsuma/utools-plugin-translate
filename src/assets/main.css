@@ -84,7 +84,7 @@ body {
 }
 
 .content section li .in-trans-a{
-    margin-left: 20px;
+    margin-left: 15px;
 }
 
 .active {
@@ -103,11 +103,24 @@ body {
 }
 
 .simple-exp {
-    color: #d1d1d1;
+    color: #b3b0b0;
+    margin-right: 25px;
 }
 
 .word-exp-li {
     margin-bottom: 16px;
+}
+
+.word-exp-see{
+    position: absolute;
+}
+.word-exp-content{
+    margin-left: 20px;
+}
+
+.word-exp-dict{
+    color: #ad7ef7;
+    font-size: 12px;
 }
 
 .express-text {
@@ -117,6 +130,10 @@ body {
     color: #f9990a;
 }
 
+.light-word{
+    color: #f03744;
+}
+
 :where(.css-dev-only-do-not-override-b92jn9).ant-message-notice .ant-message-notice-content{
     padding: 5px 10px;
     border-radius: 5px;
@@ -124,4 +141,24 @@ body {
 }
 :where(.css-dev-only-do-not-override-b92jn9).ant-message{
     top: -2px;
+}
+
+
+audio {
+    display: none;
+}
+
+.icon-audio{
+    background: url('./img/play.png') 100% 100% no-repeat;
+    background-size: cover;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.icon-audio-t{
+    position: absolute;
+    margin-left: 5px;
 }

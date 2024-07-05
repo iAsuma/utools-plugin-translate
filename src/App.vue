@@ -10,7 +10,7 @@ let titleClass = ref()
 let chkIdx
 let langFrom = ref()
 let mainTrans = ref()
-let simpleExp = ref()
+let simpleExp = ref('')
 let sidebar = ref([])
 let generalRes = ref([])
 let contentRes = ref([])
@@ -74,6 +74,49 @@ function getTransCache(input) {
       return null
   }
 }
+
+function highlightStr(str, search){
+  const replace = '<span class="light-word">'+search+'</span>'
+  str = str.replace(search, replace)
+  console.log(str)
+  return str
+}
+
+window.playAudio = playAudio
+function playAudio(){
+  console.log(111)
+}
+
+const getAudioHtml= function(keywords, type=1){
+  let audioHtml = `
+    <audio controls>
+      <source src="https://dict.youdao.com/dictvoice?type=`+type+`&audio=`+keywords+`" type="audio/mpeg">
+    </audio>
+    `
+  return audioHtml
+}
+
+const mainVoice = function(voice, inputText){
+  if(!voice || typeof voice == 'undefined'){
+    return ''
+  }
+  
+  console.log("inputText", inputText)
+  const voices = voice.split('//')
+  
+  if(voices.length == 2){
+    const v1 = '<span class="simple-exp">英 ' + voices[0] + ' /<i class="icon-audio icon-audio-t" onclick="playAudio()"></i> ' + getAudioHtml(inputText, 1) + '</span>'
+    const v2 = ' <span class="simple-exp">美 / ' + voices[1] + '<i class="icon-audio icon-audio-t" onclick="playAudio()"></i>' + getAudioHtml(inputText, 2) + '</span>'
+    voice = v1 + ' ' + v2
+  }else{
+    voice = '<span class="simple-exp">' + voice + '</span>'
+  }
+
+  
+
+  return voice
+}
+
 
 const closeMsg = function(){
   if(document.loadingMsg){
@@ -191,18 +234,18 @@ utoolsStore.onPluginEnter('', transFunc)
     <div class="sidebar">
       <!-- <a v-if="mainTrans" href="#section0">综合</a> -->
       <a v-for="(sd, index) in sidebar" :key="index+1" :href="`#section${index+1}`">{{ sd }}</a>
-      <!-- <a href="#section1">综合</a>
-      <a href="#section2">简明释义</a>
-      <a href="#section3">Section 3</a>
-      <a href="#section4">Section 4</a> -->
     </div>
     <div class="content">
       <header>
         <h1 :class="titleClass" @click="closeMsg">{{ utoolsStore.keywords }}</h1>
-        <!-- <h5 class="simple-exp">{{ simpleExp }}</h5> -->
-        <span class="simple-exp">{{ simpleExp }}</span>
-
-        <!-- <h3>{{ mainTrans }}</h3> -->
+        <div>
+          <div v-html="mainVoice(simpleExp, utoolsStore.keywords)"></div>
+          <!-- <span class="simple-exp">{{ mainVoice(simpleExp) }}</span>
+          <i class="audio-play"></i>
+          <audio controls>
+            <source src="https://dict.youdao.com/dictvoice?type=1&audio=He%20failed%20his%20driving%20test" type="audio/mpeg">您的浏览器不支持 audio 元素。
+          </audio>   -->
+        </div>
          <div>
           <span class="main-exp">{{ mainTrans }}</span>
          </div>
@@ -219,42 +262,41 @@ utoolsStore.onPluginEnter('', transFunc)
             <h3>{{ ct.label }}</h3>
             <div>
               <ul v-if="ct.mark == 'simple'">
-                <li class="word-exp-li" v-for="(chd, idx1) in ct.cidian_list" :key="idx1">
+                <li class="word-exp-li li-sim" v-for="(chd, idx1) in ct.cidian_list" :key="idx1">
                   <div v-if="langFrom == 'zh'">
                     <span class="express-text">{{ chd.words }}</span>
                   </div>
-                  <div>
+                  <div v-if="langFrom == 'zh'">
                     <span class="in-pos" v-if="chd.voice">{{ chd.voice }}</span>
                     <span :class="chd.voice ? 'in-trans in-tran-a' : 'in-trans'">{{ chd.explain }}</span>
+                  </div>
+                  <div v-else>
+                    <span class="in-pos" v-if="chd.voice">{{ chd.voice }}</span>
+                    <span :class="chd.voice ? 'in-trans-a' : 'in-trans'">{{ chd.words }}</span>
                   </div>
                 </li>
               </ul>
               <ul v-else>
-                <li class="word-exp-li" v-for="(chd, idx1) in ct.cidian_list" :key="idx1">
-                  <div v-if="langFrom == 'zh'">
-                    <span class="">{{ chd.words }}</span>
+                <li class="word-exp-li li-oth" v-for="(chd, idx1) in ct.cidian_list" :key="idx1">
+                  <div class="word-exp-see">
+                    <span class="">{{ idx1+1 }}.</span>
                   </div>
-                  <div>
-                    <span class="in-pos" v-if="chd.voice">{{ chd.voice }}</span>
-                    <span :class="chd.voice ? 'in-trans in-trans-a' : 'in-trans'">{{ chd.explain }}</span>
+                  <div class="word-exp-content">
+                    <div>
+                      <span class="" v-html="highlightStr(chd.words, utoolsStore.keywords)"></span>
+                    </div>
+                    <div>
+                      <span class="in-pos" v-if="chd.voice">{{ chd.voice }}</span>
+                      <span :class="chd.voice ? 'in-trans in-trans-a' : 'in-trans'" v-html="highlightStr(chd.explain, utoolsStore.keywords)"></span>
+                    </div>
+                    <div v-if="chd.dict">
+                      <span class="word-exp-dict">{{ chd.dict }}</span>
+                    </div>
                   </div>
                 </li>
               </ul>
-              
-              <!-- <p><span class="in-pos">adj.</span><span class="in-trans-a">快的，迅速的；系牢的，紧缚的；寻欢作乐的；不褪色的；忠实的，可靠的</span></p>
-              <p><span class="in-pos">adv.</span><span class="in-trans-a">快速地；坚定地，牢固地</span></p>
-              <p><span class="in-pos">v.</span><span class="in-trans-a">斋戒，禁食</span></p>
-              <p><span class="in-pos">n.</span><span class="in-trans-a">斋戒，斋戒期</span></p> -->
             </div>
         </section>
-        <!-- <section id="section3">
-            <h2>Section 3</h2>
-            <p>Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus. Phasellus in felis. Donec semper sapien a libero. Nam dui. Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis. Ut at dolor quis odio consequat varius. Integer ac leo. Pellentesque ultrices mattis odio. Donec vitae nisi.</p>
-        </section>
-        <section id="section4">
-            <h2>Section 4</h2>
-            <p>Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque. Duis bibendum. Morbi non quam nec dui luctus rutrum. Nulla tellus. In sagittis dui vel nisl.</p>
-        </section> -->
     </div>
   </div>
   

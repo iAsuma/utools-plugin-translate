@@ -1,0 +1,20 @@
+{
+	"main": "dist/index.html",
+	"development": {
+		"main": "http://localhost:5173/"
+	},
+	"logo": "logo.png",
+	"features": [
+		{
+		  "code": "翻译",
+		  "mainPush":true,
+		  "explain": "翻译、词典、中英词典",
+			"cmds":["翻译", "词典", {
+				"type": "over",
+				"label": "翻译",
+				"minLength": 2,
+				"maxLength": 500
+			}]
+		}
+	]
+}

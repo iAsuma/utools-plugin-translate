@@ -23,6 +23,10 @@ function isEnglish(text) {
     return /^[A-Za-z]+$/.test(text);
 }
 
+function isNumText(text) {
+  return /^[0-9]+.*[0-9]*$/.test(text)
+}
+
 function randOneStr(){
   const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   const randIndex = Math.floor(Math.random() * characters.length) -1
@@ -78,24 +82,64 @@ const closeMsg = function(){
   }
 }
 
+const isLongWord = function(text){
+  if((isChinese(text) && text.length > 5) || (isEnglish(text) && text.length > 15) ){
+    return true
+  } else {
+    return false
+  }
+}
+
+const renderingData = function(data){
+    sidebar.value = []
+    generalRes.value = []
+    contentRes.value = []
+    let list = data.trans_list
+    langFrom.value = data.from
+
+    mainTrans.value = data.text
+    simpleExp.value = data.reading
+
+    for (const key in list) {
+      let item = list[key]
+      if (item.b_type == 1){
+        generalRes.value.push(item)
+      } else {
+        let ct = item.cidian
+        contentRes.value = ct
+        for (const kk in ct) {
+          let iitem = ct[kk]
+          sidebar.value.push(iitem.label)
+        }
+      }
+    }
+
+    delayScrollAction()
+}
+
+
 const transFunc = function(text){
   if (chkIdx) {
     clearTimeout(chkIdx)
   }
+  
+  const textLen = text.length
+  console.log("textLen", textLen, document.loadingMsg)
 
-  if(text.length == 0){
-    closeMsg()
-  }
-
-  if((isChinese(text) && text.length > 6) || (isEnglish(text) && text.length > 15) ){
+  if (isLongWord(text) ){
     titleClass.value = "main-title"
   } else {
     titleClass.value = ""
   }
 
-  console.log("text.length", text.length)
+  if (textLen < 2 || isNumText(text)){
+    closeMsg()
+    return
+  }
 
-  if (text.length < 2){
+  if(textLen > 501){
+    closeMsg()
+    document.loadingMsg = message.error('字数超出限制，最多500个字', 2)
     return
   }
 
@@ -104,198 +148,37 @@ const transFunc = function(text){
   }
 
   chkIdx = setTimeout(function(){
-    let res = `{
-    "code": 0,
-    "message": "",
-    "data": {
-        "src": "万物",
-        "text": "creation",
-        "from": "zh",
-        "to": "en",
-        "solution": "baidu_fanyi",
-        "reading": "/ wàn wù /",
-        "trans_list": [
-            {
-                "src": "万物",
-                "text": "all",
-                "from": "zh",
-                "to": "en",
-                "solution": "youdao_cidian",
-                "b_type": 2,
-                "reading": "/ wàn wù /",
-                "cidian": [
-                    {
-                        "label": "简明释义",
-                        "mark": "simple",
-                        "cidian_list": [
-                            {
-                                "words": "all",
-                                "explain": "全部；每一个；极度，尽量；无论什么，任何；唯一，仅仅；全部的；每一个的；任何的；尽可能多的；全然是……的，完全表现出……的；（某一体征）显著突出的；完全地；各方，各选手；非常，太；所有，全部；唯一；全部，所有；【名】 （All）（英、美、巴、加）奥尔（人名）；",
-                                "voice": "",
-                                "dict": ""
-                            },
-                            {
-                                "words": "all things on earth",
-                                "explain": "万物，万类；",
-                                "voice": "",
-                                "dict": ""
-                            }
-                        ]
-                    },
-                    {
-                        "label": "双语例句",
-                        "mark": "sentence",
-                        "cidian_list": [
-                            {
-                                "words": "圆盘似的月亮会高悬在夜空中，将柔和的月光洒向世间万物。",
-                                "explain": "The moon's round orb would shine high in the sky, casting its velvety light on everything.",
-                                "voice": "",
-                                "dict": ""
-                            },
-                            {
-                                "words": "落日的余晖洒在万物之上。",
-                                "explain": "The setting sun was shedding a golden light over everything.",
-                                "voice": "",
-                                "dict": ""
-                            },
-                            {
-                                "words": "夏天万物生长得都很快。",
-                                "explain": "Everything grows fast in summer.",
-                                "voice": "",
-                                "dict": ""
-                            }
-                        ]
-                    },
-                    {
-                        "label": "网络释义",
-                        "mark": "networds",
-                        "cidian_list": [
-                            {
-                                "words": "universe",
-                                "explain": "... status 地位，身份，情况，状况 universe 宇宙，万物 agent 代理人(商)，代表 ...",
-                                "voice": "",
-                                "dict": ""
-                            },
-                            {
-                                "words": "Everything",
-                                "explain": "角色放置类挂机放置类日系联机放置类万物万物（Everything）是一款非常独特的放置类休闲游戏，在这里你就..",
-                                "voice": "",
-                                "dict": ""
-                            },
-                            {
-                                "words": "thing",
-                                "explain": "...  thickness 厚度  thing 万物  thinking 思想 ...",
-                                "voice": "",
-                                "dict": ""
-                            },
-                            {
-                                "words": "all things on earth",
-                                "explain": "... [ wealthy；ten million cash ] 一万贯铜钱，形容钱财极多 [ very wealthy；be a millionaire ] 家中广有钱财，尤如腰缠万贯 [ all things on earth ] 万物 ...",
-                                "voice": "",
-                                "dict": ""
-                            }
-                        ]
-                    },
-                    {
-                        "label": "短语",
-                        "mark": "phrase",
-                        "cidian_list": [
-                            {
-                                "words": "万物理论",
-                                "explain": "The Theory of Everything ; TheTheor ; the theory of ; A Theory of Everything",
-                                "voice": "",
-                                "dict": ""
-                            },
-                            {
-                                "words": "万物有灵论",
-                                "explain": "the animism ; Animistic thinking ; animism ; animatism",
-                                "voice": "",
-                                "dict": ""
-                            },
-                            {
-                                "words": "万物互联",
-                                "explain": "Internet of Everything ; IoE ; IOT",
-                                "voice": "",
-                                "dict": ""
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "src": "万物",
-                "text": "creation",
-                "from": "zh",
-                "to": "en",
-                "solution": "baidu_fanyi",
-                "b_type": 1,
-                "reading": "",
-                "cidian": null
-            }
-        ]
-    }
-}`;
-
     const cacheData = getTransCache(text)
     if(cacheData){
-      console.log("geted", "从缓存中获取了数据", cacheData)
+      console.log("从缓存中获取了数据", cacheData)
+      // 渲染数据
+      renderingData(cacheData)
+      closeMsg()
     }else{
-      console.log("seted", "设置缓存")
-      const jj = JSON.parse(res)
-      setTransCache(text, jj.data)
-      console.log("afeter", getTransCache(text))
+      http.post('/one', {keywords: text})
+        .then(response => {
+          console.log("异步请求", response.data);
+          let resJson = response
+        if(resJson.code != 0) {
+          return
+        }
+
+        // 渲染数据
+        renderingData(resJson.data)
+
+        // 存入本地缓存
+        if(!isLongWord(text)){
+          console.log("seted", "设置缓存")
+          setTransCache(text, resJson.data)
+          console.log("afeter", getTransCache(text))
+        }
+        closeMsg()
+      })
+      .catch(error => {
+        message.error('Maybe net has an error', 2)
+        console.error('There was an error!', error);
+      });
     }
-
-    // http.post('/one', {keywords: text})
-    //   .then(response => {
-    //     console.log("response.data",response.data);
-    //     // let resJson = JSON.parse(res)
-    //     let resJson = response
-    //   if(resJson.code != 0) {
-    //     return
-    //   }
-
-    //   sidebar.value = []
-    //   generalRes.value = []
-    //   contentRes.value = []
-    //   let data = resJson.data
-    //   let list = data.trans_list
-    //   langFrom.value = data.from
-
-    //   console.log('time', resJson.code, resJson.message, resJson.data)
-
-    //   mainTrans.value = data.text
-    //   simpleExp.value = data.reading
-
-    //   // console.log(111, list)
-
-    //   for (const key in list) {
-    //     let item = list[key]
-    //     if (item.b_type == 1){
-    //       generalRes.value.push(item)
-    //     } else {
-    //       let ct = item.cidian
-    //       contentRes.value = ct
-    //       for (const kk in ct) {
-    //         let iitem = ct[kk]
-    //         sidebar.value.push(iitem.label)
-    //       }
-    //     }
-    //   }
-      
-    //   console.log('sidebar', sidebar)
-    //   console.log('generalRes', generalRes)
-    //   console.log('contentRes', contentRes)
-
-      
-      
-    //   delayScrollAction()
-    // })
-    // .catch(error => {
-    //   console.error('There was an error!', error);
-    // });
-
-    
   }, 1100)
 }
 
@@ -377,10 +260,6 @@ utoolsStore.onPluginEnter('', transFunc)
   
 </template>
 <script>
-
-</script>
-
-<script>
 let sidebarLinks;
 let contentSections;
 
@@ -415,6 +294,7 @@ function delayScrollAction(){
     setTimeout(function(){
       scrollWindow()  
     }, 1000)
+    console.log("srcoll.......")
 }
 
 document.addEventListener("DOMContentLoaded", function() {
